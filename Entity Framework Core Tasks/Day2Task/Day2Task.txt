@@ -1,0 +1,69 @@
+Install-Package Microsoft.EntityFrameworkCore.SqlServer
+
+Install-Package Microsoft.EntityFrameworkCore.Tools
+
+Install-Package Microsoft.EntityFrameworkCore.Design
+
+Scaffold-DbContext "Server=DESKTOP-5R1EPAT;Database=University;Trusted_Connection
+=True;Encrypt=False" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models
+
+TaskDay1inEF: Create Desktop Application with CRUD Operations using DB Approach
+
+Objective:
+Develop a Desktop Application (using .NET WinForms/WPF) to manage a dataset. 
+The application should provide full CRUD functionality with clean and maintainable code.
+
+Requirements:
+
+Data Management:
+
+Display data in a grid/table format.
+
+Implement CRUD Operations:
+
+Create → Add new record.
+
+Read → View records in a DataGrid.
+
+Update → Edit existing records.
+
+Delete → Remove records.
+
+UI & UX Enhancements:
+
+Clear layout with labels, textboxes, and buttons.
+
+DataGrid should auto-refresh after operations.
+
+Validation before saving/updating data.
+
+Code Quality:
+
+Apply Clean Code Principles (e.g., separation of concerns, reusable methods).
+
+Use a Repository Layer for data handling instead of direct operations inside the UI code.
+
+Proper naming conventions for classes, methods, and variables.
+
+Button Visibility & State Management:
+
+Buttons should be enabled/disabled depending on the current state:
+
+Add visible when no item is selected.
+
+Update/Delete enabled only when an item is selected.
+
+Reset/Clear button should appear after editing/adding.
+
+Testing:
+
+Ensure that all CRUD operations work correctly.
+
+Validate visibility and state management of buttons.
+
+Deliverables:
+
+Fully functional Desktop Application project (WinForms/WPF).
+
+Source code with comments.
+
