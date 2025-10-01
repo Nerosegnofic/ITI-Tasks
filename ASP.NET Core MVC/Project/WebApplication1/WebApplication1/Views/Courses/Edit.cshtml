@@ -1,7 +1,7 @@
 ﻿@model WebApplication1.Models.Course
-
 @{
     ViewData["Title"] = "Edit Course";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h1>Edit Course</h1>
@@ -10,47 +10,50 @@
 <div class="row">
     <div class="col-md-6">
         <form asp-action="Edit">
-            <input type="hidden" asp-for="Id" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
 
-            <div class="form-group mb-3">
-                <label asp-for="Name"></label>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Degree"></label>
-                <input asp-for="Degree" class="form-control" />
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="MinimumDegree"></label>
-                <input asp-for="MinimumDegree" class="form-control" />
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Hours"></label>
-                <input asp-for="Hours" class="form-control" />
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="DeptId">Department</label>
-                <select asp-for="DeptId" class="form-control" asp-items="ViewBag.DeptId"></select>
-            </div>
-
-            <div class="form-group mb-3">
-                <label>Instructors</label>
-                <select asp-for="Instructors" multiple class="form-control" asp-items="ViewBag.InstructorIds"></select>
+                <span asp-validation-for="Name" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                <label asp-for="Degree" class="control-label"></label>
+                <input asp-for="Degree" class="form-control" />
+                <span asp-validation-for="Degree" class="text-danger"></span>
             </div>
+
+            <div class="form-group">
+                <label asp-for="MinimumDegree" class="control-label"></label>
+                <input asp-for="MinimumDegree" class="form-control" />
+                <span asp-validation-for="MinimumDegree" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Hours" class="control-label"></label>
+                <input asp-for="Hours" class="form-control" />
+                <span asp-validation-for="Hours" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="DeptId" class="control-label"></label>
+                <select asp-for="DeptId" class="form-control" asp-items="ViewBag.DeptId"></select>
+                <span asp-validation-for="DeptId" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save</button>
         </form>
     </div>
 </div>
 
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

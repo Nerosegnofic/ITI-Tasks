@@ -1,42 +1,43 @@
 ﻿@model WebApplication1.Models.CourseStudent
-
 @{
     ViewData["Title"] = "Edit CourseStudent";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h1>Edit CourseStudent</h1>
 <hr />
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
 
-            <div class="form-group mb-3">
+            <div class="form-group">
+                <label asp-for="CrsId" class="control-label"></label>
+                <select asp-for="CrsId" class="form-control" asp-items="ViewBag.CrsId"></select>
+                <span asp-validation-for="CrsId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="StdId" class="control-label"></label>
+                <select asp-for="StdId" class="form-control" asp-items="ViewBag.StdId"></select>
+                <span asp-validation-for="StdId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
                 <label asp-for="Degree" class="control-label"></label>
                 <input asp-for="Degree" class="form-control" />
                 <span asp-validation-for="Degree" class="text-danger"></span>
             </div>
 
-            <!-- Dropdown for Course -->
-            <div class="form-group mb-3">
-                <label asp-for="CrsId" class="control-label">Course</label>
-                <select asp-for="CrsId" class="form-control" asp-items="ViewBag.CrsId"></select>
-            </div>
-
-            <!-- Dropdown for Student -->
-            <div class="form-group mb-3">
-                <label asp-for="StdId" class="control-label">Student</label>
-                <select asp-for="StdId" class="form-control" asp-items="ViewBag.StdId"></select>
-            </div>
-
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
         </form>
     </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

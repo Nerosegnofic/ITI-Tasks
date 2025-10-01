@@ -1,24 +1,24 @@
 ﻿@model WebApplication1.Models.CourseStudent
-
 @{
-    ViewData["Title"] = "Details CourseStudent";
+    ViewData["Title"] = "CourseStudent Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h1>CourseStudent Details</h1>
 <hr />
 
 <dl class="row">
-    <dt class="col-sm-2">Degree</dt>
-    <dd class="col-sm-10">@Html.DisplayFor(model => model.Degree)</dd>
+    <dt class="col-sm-3">Course</dt>
+    <dd class="col-sm-9">@Model.Course.Name</dd>
 
-    <dt class="col-sm-2">Course</dt>
-    <dd class="col-sm-10">@Model.Course?.Name</dd>
+    <dt class="col-sm-3">Student</dt>
+    <dd class="col-sm-9">@Model.Student.Name</dd>
 
-    <dt class="col-sm-2">Student</dt>
-    <dd class="col-sm-10">@Model.Student?.Name</dd>
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Degree)</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(m => m.Degree)</dd>
 </dl>
 
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edit</a>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
 </div>
