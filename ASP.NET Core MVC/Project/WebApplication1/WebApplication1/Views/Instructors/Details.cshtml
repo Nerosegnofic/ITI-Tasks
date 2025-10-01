@@ -1,54 +1,33 @@
 ﻿@model WebApplication1.Models.Instructor
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Instructor Details";
 }
 
-<h1>Details</h1>
+<h1>Instructor Details</h1>
+<hr />
+
+<dl class="row">
+    <dt class="col-sm-2">Name</dt>
+    <dd class="col-sm-10">@Model.Name</dd>
+
+    <dt class="col-sm-2">Salary</dt>
+    <dd class="col-sm-10">@Model.Salary?.ToString("C")</dd>
+
+    <dt class="col-sm-2">Address</dt>
+    <dd class="col-sm-10">@Model.Address</dd>
+
+    <dt class="col-sm-2">Image</dt>
+    <dd class="col-sm-10">@Model.Image</dd>
+
+    <dt class="col-sm-2">Department</dt>
+    <dd class="col-sm-10">@Model.Department?.Name</dd>
+
+    <dt class="col-sm-2">Course</dt>
+    <dd class="col-sm-10">@Model.Course?.Name</dd>
+</dl>
 
 <div>
-    <h4>Instructor</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Salary)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Salary)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Address)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Address)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Image)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Image)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Department)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Department.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Course)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Course.Id)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </div>
