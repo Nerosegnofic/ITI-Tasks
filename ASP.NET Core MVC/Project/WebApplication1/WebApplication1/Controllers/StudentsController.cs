@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
@@ -20,16 +16,29 @@ namespace WebApplication1.Controllers
         }
 
         // GET: Students
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            var learningCenterContext = _context.Students.Include(s => s.Department);
-            return View(await learningCenterContext.ToListAsync());
+            ViewData["CurrentFilter"] = searchString;
+
+            var query = _context.Students
+                .Include(s => s.Department)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(s =>
+                    s.Name.Contains(searchString) ||
+                    s.Department.Name.Contains(searchString));
+            }
+
+            var students = await query.ToListAsync();
+            return View(students);
         }
 
         // GET: Students/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            if (id == null || _context.Students == null)
             {
                 return NotFound();
             }
@@ -37,6 +46,7 @@ namespace WebApplication1.Controllers
             var student = await _context.Students
                 .Include(s => s.Department)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (student == null)
             {
                 return NotFound();
@@ -48,16 +58,14 @@ namespace WebApplication1.Controllers
         // GET: Students/Create
         public IActionResult Create()
         {
-            ViewData["DeptId"] = new SelectList(_context.Departments, "Id", "Id");
+            ViewData["DeptId"] = new SelectList(_context.Departments, "Id", "Name");
             return View();
         }
 
         // POST: Students/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Image,Address,Grade,DeptId")] Student student)
+        public async Task<IActionResult> Create([Bind("Id,Name,Age,Address,DeptId")] Student student)
         {
             if (ModelState.IsValid)
             {
@@ -65,14 +73,14 @@ namespace WebApplication1.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["DeptId"] = new SelectList(_context.Departments, "Id", "Id", student.DeptId);
+            ViewData["DeptId"] = new SelectList(_context.Departments, "Id", "Name", student.DeptId);
             return View(student);
         }
 
         // GET: Students/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (id == null || _context.Students == null)
             {
                 return NotFound();
             }
@@ -82,16 +90,15 @@ namespace WebApplication1.Controllers
             {
                 return NotFound();
             }
-            ViewData["DeptId"] = new SelectList(_context.Departments, "Id", "Id", student.DeptId);
+
+            ViewData["DeptId"] = new SelectList(_context.Departments, "Id", "Name", student.DeptId);
             return View(student);
         }
 
         // POST: Students/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Image,Address,Grade,DeptId")] Student student)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Age,Address,DeptId")] Student student)
         {
             if (id != student.Id)
             {
@@ -118,14 +125,15 @@ namespace WebApplication1.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["DeptId"] = new SelectList(_context.Departments, "Id", "Id", student.DeptId);
+
+            ViewData["DeptId"] = new SelectList(_context.Departments, "Id", "Name", student.DeptId);
             return View(student);
         }
 
         // GET: Students/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (id == null || _context.Students == null)
             {
                 return NotFound();
             }
@@ -133,6 +141,7 @@ namespace WebApplication1.Controllers
             var student = await _context.Students
                 .Include(s => s.Department)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (student == null)
             {
                 return NotFound();
@@ -146,6 +155,11 @@ namespace WebApplication1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            if (_context.Students == null)
+            {
+                return Problem("Entity set 'LearningCenterContext.Students' is null.");
+            }
+
             var student = await _context.Students.FindAsync(id);
             if (student != null)
             {
@@ -158,7 +172,7 @@ namespace WebApplication1.Controllers
 
         private bool StudentExists(int id)
         {
-            return _context.Students.Any(e => e.Id == id);
+            return (_context.Students?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
@@ -20,24 +16,39 @@ namespace WebApplication1.Controllers
         }
 
         // GET: CourseStudents
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            var learningCenterContext = _context.CourseStudents.Include(c => c.Course).Include(c => c.Student);
-            return View(await learningCenterContext.ToListAsync());
+            ViewData["CurrentFilter"] = searchString;
+
+            var query = _context.CourseStudents
+                .Include(cs => cs.Course)
+                .Include(cs => cs.Student)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(cs =>
+                    cs.Course.Name.Contains(searchString) ||
+                    cs.Student.Name.Contains(searchString));
+            }
+
+            var courseStudents = await query.ToListAsync();
+            return View(courseStudents);
         }
 
         // GET: CourseStudents/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            if (id == null || _context.CourseStudents == null)
             {
                 return NotFound();
             }
 
             var courseStudent = await _context.CourseStudents
-                .Include(c => c.Course)
-                .Include(c => c.Student)
+                .Include(cs => cs.Course)
+                .Include(cs => cs.Student)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (courseStudent == null)
             {
                 return NotFound();
@@ -49,14 +60,12 @@ namespace WebApplication1.Controllers
         // GET: CourseStudents/Create
         public IActionResult Create()
         {
-            ViewData["CrsId"] = new SelectList(_context.Courses, "Id", "Id");
-            ViewData["StdId"] = new SelectList(_context.Students, "Id", "Id");
+            ViewData["CrsId"] = new SelectList(_context.Courses, "Id", "Name");
+            ViewData["StdId"] = new SelectList(_context.Students, "Id", "Name");
             return View();
         }
 
         // POST: CourseStudents/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Degree,CrsId,StdId")] CourseStudent courseStudent)
@@ -67,15 +76,15 @@ namespace WebApplication1.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CrsId"] = new SelectList(_context.Courses, "Id", "Id", courseStudent.CrsId);
-            ViewData["StdId"] = new SelectList(_context.Students, "Id", "Id", courseStudent.StdId);
+            ViewData["CrsId"] = new SelectList(_context.Courses, "Id", "Name", courseStudent.CrsId);
+            ViewData["StdId"] = new SelectList(_context.Students, "Id", "Name", courseStudent.StdId);
             return View(courseStudent);
         }
 
         // GET: CourseStudents/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (id == null || _context.CourseStudents == null)
             {
                 return NotFound();
             }
@@ -85,14 +94,13 @@ namespace WebApplication1.Controllers
             {
                 return NotFound();
             }
-            ViewData["CrsId"] = new SelectList(_context.Courses, "Id", "Id", courseStudent.CrsId);
-            ViewData["StdId"] = new SelectList(_context.Students, "Id", "Id", courseStudent.StdId);
+
+            ViewData["CrsId"] = new SelectList(_context.Courses, "Id", "Name", courseStudent.CrsId);
+            ViewData["StdId"] = new SelectList(_context.Students, "Id", "Name", courseStudent.StdId);
             return View(courseStudent);
         }
 
         // POST: CourseStudents/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Degree,CrsId,StdId")] CourseStudent courseStudent)
@@ -122,23 +130,25 @@ namespace WebApplication1.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CrsId"] = new SelectList(_context.Courses, "Id", "Id", courseStudent.CrsId);
-            ViewData["StdId"] = new SelectList(_context.Students, "Id", "Id", courseStudent.StdId);
+
+            ViewData["CrsId"] = new SelectList(_context.Courses, "Id", "Name", courseStudent.CrsId);
+            ViewData["StdId"] = new SelectList(_context.Students, "Id", "Name", courseStudent.StdId);
             return View(courseStudent);
         }
 
         // GET: CourseStudents/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (id == null || _context.CourseStudents == null)
             {
                 return NotFound();
             }
 
             var courseStudent = await _context.CourseStudents
-                .Include(c => c.Course)
-                .Include(c => c.Student)
+                .Include(cs => cs.Course)
+                .Include(cs => cs.Student)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (courseStudent == null)
             {
                 return NotFound();
@@ -152,6 +162,10 @@ namespace WebApplication1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            if (_context.CourseStudents == null)
+            {
+                return Problem("Entity set 'LearningCenterContext.CourseStudents' is null.");
+            }
             var courseStudent = await _context.CourseStudents.FindAsync(id);
             if (courseStudent != null)
             {
@@ -164,7 +178,7 @@ namespace WebApplication1.Controllers
 
         private bool CourseStudentExists(int id)
         {
-            return _context.CourseStudents.Any(e => e.Id == id);
+            return (_context.CourseStudents?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
