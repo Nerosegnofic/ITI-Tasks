@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApplication1.Models;
 using WebApplication1.Repositories.Interfaces;
+using WebApplication1.Filters;
 
 namespace WebApplication1.Controllers
 {
+    [AuthorizeStudentFilter]
     public class StudentsController : Controller
     {
         private readonly IStudentRepository _studentRepo;
@@ -23,7 +25,9 @@ namespace WebApplication1.Controllers
             var list = (await _studentRepo.GetAllAsync()).ToList();
             if (!string.IsNullOrWhiteSpace(searchString))
             {
-                list = list.Where(s => s.Name.Contains(searchString) || (s.Department != null && s.Department.Name.Contains(searchString))).ToList();
+                list = list.Where(s => s.Name.Contains(searchString) ||
+                                       (s.Department != null && s.Department.Name.Contains(searchString)))
+                           .ToList();
             }
             return View(list);
         }

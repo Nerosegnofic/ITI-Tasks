@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Http; // For Session
 using System.Linq;
 using System.Threading.Tasks;
 using WebApplication1.Models;
 using WebApplication1.Repositories.Interfaces;
+using System.Collections.Generic;
 
 namespace WebApplication1.Controllers
 {
@@ -23,10 +25,15 @@ namespace WebApplication1.Controllers
         public async Task<IActionResult> Index(string searchString)
         {
             var list = (await _courseRepo.GetAllAsync()).ToList();
+
             if (!string.IsNullOrWhiteSpace(searchString))
             {
                 list = list.Where(c => c.Name.Contains(searchString)).ToList();
             }
+
+            var selectedCourseId = HttpContext.Session.GetInt32("SelectedCourseId");
+            ViewBag.SelectedCourseId = selectedCourseId;
+
             return View(list);
         }
 
@@ -51,10 +58,16 @@ namespace WebApplication1.Controllers
         {
             if (ModelState.IsValid)
             {
-                // If you store instructors as relationship, ensure Course.Instructors is set as needed.
+                if (InstructorIds != null && InstructorIds.Any())
+                {
+                    var selectedInstructors = (await _instrRepo.GetAllAsync()).Where(i => InstructorIds.Contains(i.Id)).ToList();
+                    course.Instructors = selectedInstructors;
+                }
+
                 await _courseRepo.AddAsync(course);
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["DeptId"] = new SelectList(await _deptRepo.GetAllAsync(), "Id", "Name", course.DeptId);
             ViewData["InstructorIds"] = new SelectList(await _instrRepo.GetAllAsync(), "Id", "Name", InstructorIds);
             return View(course);
@@ -65,6 +78,7 @@ namespace WebApplication1.Controllers
             if (id == null) return NotFound();
             var course = await _courseRepo.GetByIdAsync(id.Value);
             if (course == null) return NotFound();
+
             ViewData["DeptId"] = new SelectList(await _deptRepo.GetAllAsync(), "Id", "Name", course.DeptId);
             ViewData["InstructorIds"] = new SelectList(await _instrRepo.GetAllAsync(), "Id", "Name", course.Instructors?.Select(i => i.Id));
             return View(course);
@@ -75,11 +89,19 @@ namespace WebApplication1.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Degree,MinimumDegree,Hours,DeptId")] Course course, int[] InstructorIds)
         {
             if (id != course.Id) return NotFound();
+
             if (ModelState.IsValid)
             {
+                if (InstructorIds != null && InstructorIds.Any())
+                {
+                    var selectedInstructors = (await _instrRepo.GetAllAsync()).Where(i => InstructorIds.Contains(i.Id)).ToList();
+                    course.Instructors = selectedInstructors;
+                }
+
                 await _courseRepo.UpdateAsync(course);
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["DeptId"] = new SelectList(await _deptRepo.GetAllAsync(), "Id", "Name", course.DeptId);
             ViewData["InstructorIds"] = new SelectList(await _instrRepo.GetAllAsync(), "Id", "Name", InstructorIds);
             return View(course);
@@ -98,6 +120,13 @@ namespace WebApplication1.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _courseRepo.DeleteAsync(id);
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public IActionResult JoinCourse(int courseId)
+        {
+            HttpContext.Session.SetInt32("SelectedCourseId", courseId);
             return RedirectToAction(nameof(Index));
         }
     }
