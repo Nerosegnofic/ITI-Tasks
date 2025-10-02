@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Courses";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var selectedCourseId = ViewBag.SelectedCourseId as int?;
 }
 
 <h1>Courses</h1>
@@ -23,13 +24,27 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
+            var isJoined = (selectedCourseId.HasValue && selectedCourseId.Value == item.Id);
+
+            <tr class="@(isJoined ? "table-success" : "")">
                 <td>@item.Name</td>
                 <td>@item.Degree</td>
                 <td>@item.MinimumDegree</td>
                 <td>@item.Hours</td>
                 <td>@item.Department?.Name</td>
                 <td>
+                    @if (isJoined)
+                    {
+                        <span class="badge bg-success">Joined</span>
+                    }
+                    else
+                    {
+                        <form asp-action="JoinCourse" method="post" style="display:inline">
+                            <input type="hidden" name="courseId" value="@item.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Join</button>
+                        </form>
+                    }
+                    |
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                     <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
