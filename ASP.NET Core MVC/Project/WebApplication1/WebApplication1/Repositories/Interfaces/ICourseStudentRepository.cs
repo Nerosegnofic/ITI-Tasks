@@ -8,5 +8,8 @@ namespace WebApplication1.Repositories.Interfaces
     {
         Task<IEnumerable<CourseStudent>> GetByStudentIdAsync(int stdId);
         Task<IEnumerable<CourseStudent>> GetByCourseIdAsync(int crsId);
+
+        Task<IEnumerable<CourseStudent>> GetAllWithDetailsAsync();
+        Task<CourseStudent?> GetByIdWithDetailsAsync(int id);
     }
 }

@@ -6,7 +6,10 @@ namespace WebApplication1.Repositories.Interfaces
 {
     public interface IDepartmentRepository : IReadableRepository<Department>, IWritableRepository<Department>
     {
-        // e.g. include nav properties
+        // Include navigation properties for a single department
         Task<Department?> GetWithDetailsAsync(int id);
+
+        // Include navigation properties for all departments
+        Task<IEnumerable<Department>> GetAllWithDetailsAsync();
     }
 }

@@ -46,6 +46,15 @@ namespace WebApplication1.Repositories.Implementations
                 .FirstOrDefaultAsync(d => d.Id == id);
         }
 
+        public async Task<IEnumerable<Department>> GetAllWithDetailsAsync()
+        {
+            return await _context.Departments
+                .Include(d => d.Courses)
+                .Include(d => d.Students)
+                .Include(d => d.Instructors)
+                .ToListAsync();
+        }
+
         public async Task UpdateAsync(Department entity)
         {
             _context.Departments.Update(entity);

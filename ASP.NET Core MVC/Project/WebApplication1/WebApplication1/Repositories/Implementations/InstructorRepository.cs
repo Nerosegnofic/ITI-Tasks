@@ -30,23 +30,43 @@ namespace WebApplication1.Repositories.Implementations
 
         public async Task<IEnumerable<Instructor>> GetAllAsync()
         {
-            return await _context.Instructors.Include(i => i.Department)
-                                             .Include(i => i.Course)
-                                             .ToListAsync();
+            return await _context.Instructors
+                                 .Include(i => i.Department)
+                                 .Include(i => i.Course)
+                                 .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Instructor>> GetAllWithDetailsAsync()
+        {
+            return await _context.Instructors
+                                 .Include(i => i.Department)
+                                 .Include(i => i.Course)
+                                 .ToListAsync();
         }
 
         public async Task<Instructor?> GetByIdAsync(int id)
         {
-            return await _context.Instructors.Include(i => i.Department)
-                                             .Include(i => i.Course)
-                                             .FirstOrDefaultAsync(i => i.Id == id);
+            return await _context.Instructors
+                                 .Include(i => i.Department)
+                                 .Include(i => i.Course)
+                                 .FirstOrDefaultAsync(i => i.Id == id);
+        }
+
+        public async Task<Instructor?> GetWithDetailsAsync(int id)
+        {
+            return await _context.Instructors
+                                 .Include(i => i.Department)
+                                 .Include(i => i.Course)
+                                 .FirstOrDefaultAsync(i => i.Id == id);
         }
 
         public async Task<IEnumerable<Instructor>> GetByDepartmentAsync(int deptId)
         {
-            return await _context.Instructors.Where(i => i.DeptId == deptId)
-                                             .Include(i => i.Department)
-                                             .ToListAsync();
+            return await _context.Instructors
+                                 .Where(i => i.DeptId == deptId)
+                                 .Include(i => i.Department)
+                                 .Include(i => i.Course)
+                                 .ToListAsync();
         }
 
         public async Task UpdateAsync(Instructor entity)

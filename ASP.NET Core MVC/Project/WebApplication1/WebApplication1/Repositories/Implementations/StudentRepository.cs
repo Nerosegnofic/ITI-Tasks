@@ -8,8 +8,6 @@ using WebApplication1.Repositories.Interfaces;
 
 namespace WebApplication1.Repositories.Implementations
 {
-    // SRP: Only handles Student-related data operations.
-    // ISP: Implements only read/write interfaces via IStudentRepository (no unnecessary methods).
     public class StudentRepository : IStudentRepository
     {
         private readonly LearningCenterContext _context;
@@ -24,28 +22,46 @@ namespace WebApplication1.Repositories.Implementations
 
         public async Task DeleteAsync(int id)
         {
-            var s = await _context.Students.FindAsync(id);
-            if (s == null) return;
-            _context.Students.Remove(s);
+            var student = await _context.Students.FindAsync(id);
+            if (student == null) return;
+            _context.Students.Remove(student);
             await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<Student>> GetAllAsync()
         {
-            return await _context.Students.Include(s => s.Department).ToListAsync();
+            return await _context.Students
+                                 .Include(s => s.Department)
+                                 .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Student>> GetAllWithDetailsAsync()
+        {
+            return await _context.Students
+                                 .Include(s => s.Department)
+                                 .ToListAsync();
         }
 
         public async Task<Student?> GetByIdAsync(int id)
         {
-            return await _context.Students.Include(s => s.Department)
-                                          .FirstOrDefaultAsync(s => s.Id == id);
+            return await _context.Students
+                                 .Include(s => s.Department)
+                                 .FirstOrDefaultAsync(s => s.Id == id);
+        }
+
+        public async Task<Student?> GetWithDetailsAsync(int id)
+        {
+            return await _context.Students
+                                 .Include(s => s.Department)
+                                 .FirstOrDefaultAsync(s => s.Id == id);
         }
 
         public async Task<IEnumerable<Student>> GetByDepartmentAsync(int deptId)
         {
-            return await _context.Students.Where(s => s.DeptId == deptId)
-                                          .Include(s => s.Department)
-                                          .ToListAsync();
+            return await _context.Students
+                                 .Where(s => s.DeptId == deptId)
+                                 .Include(s => s.Department)
+                                 .ToListAsync();
         }
 
         public async Task UpdateAsync(Student entity)

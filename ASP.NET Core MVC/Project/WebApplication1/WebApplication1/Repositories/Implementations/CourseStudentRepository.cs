@@ -30,18 +30,12 @@ namespace WebApplication1.Repositories.Implementations
 
         public async Task<IEnumerable<CourseStudent>> GetAllAsync()
         {
-            return await _context.CourseStudents
-                                 .Include(cs => cs.Course)
-                                 .Include(cs => cs.Student)
-                                 .ToListAsync();
+            return await _context.CourseStudents.ToListAsync();
         }
 
         public async Task<CourseStudent?> GetByIdAsync(int id)
         {
-            return await _context.CourseStudents
-                                 .Include(cs => cs.Course)
-                                 .Include(cs => cs.Student)
-                                 .FirstOrDefaultAsync(cs => cs.Id == id);
+            return await _context.CourseStudents.FindAsync(id);
         }
 
         public async Task<IEnumerable<CourseStudent>> GetByCourseIdAsync(int crsId)
@@ -66,6 +60,23 @@ namespace WebApplication1.Repositories.Implementations
         {
             _context.CourseStudents.Update(entity);
             await _context.SaveChangesAsync();
+        }
+
+        // ✅ New methods for controller
+        public async Task<IEnumerable<CourseStudent>> GetAllWithDetailsAsync()
+        {
+            return await _context.CourseStudents
+                                 .Include(cs => cs.Course)
+                                 .Include(cs => cs.Student)
+                                 .ToListAsync();
+        }
+
+        public async Task<CourseStudent?> GetByIdWithDetailsAsync(int id)
+        {
+            return await _context.CourseStudents
+                                 .Include(cs => cs.Course)
+                                 .Include(cs => cs.Student)
+                                 .FirstOrDefaultAsync(cs => cs.Id == id);
         }
     }
 }

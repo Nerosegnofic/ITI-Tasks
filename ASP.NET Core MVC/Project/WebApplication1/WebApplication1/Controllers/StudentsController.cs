@@ -20,32 +20,40 @@ namespace WebApplication1.Controllers
             _deptRepo = deptRepo;
         }
 
+        // GET: Index
         public async Task<IActionResult> Index(string searchString)
         {
-            var list = (await _studentRepo.GetAllAsync()).ToList();
+            ViewData["CurrentFilter"] = searchString;
+
+            var list = await _studentRepo.GetAllWithDetailsAsync();
             if (!string.IsNullOrWhiteSpace(searchString))
             {
-                list = list.Where(s => s.Name.Contains(searchString) ||
-                                       (s.Department != null && s.Department.Name.Contains(searchString)))
-                           .ToList();
+                list = list.Where(s =>
+                    (!string.IsNullOrEmpty(s.Name) && s.Name.Contains(searchString)) ||
+                    (s.Department != null && s.Department.Name.Contains(searchString))
+                ).ToList();
             }
+
             return View(list);
         }
 
+        // GET: Details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
-            var student = await _studentRepo.GetByIdAsync(id.Value);
+            var student = await _studentRepo.GetWithDetailsAsync(id.Value);
             if (student == null) return NotFound();
             return View(student);
         }
 
+        // GET: Create
         public async Task<IActionResult> Create()
         {
             ViewData["DeptId"] = new SelectList(await _deptRepo.GetAllAsync(), "Id", "Name");
             return View();
         }
 
+        // POST: Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Image,Address,Grade,DeptId")] Student student)
@@ -59,6 +67,7 @@ namespace WebApplication1.Controllers
             return View(student);
         }
 
+        // GET: Edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -68,6 +77,7 @@ namespace WebApplication1.Controllers
             return View(student);
         }
 
+        // POST: Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Image,Address,Grade,DeptId")] Student student)
@@ -82,14 +92,16 @@ namespace WebApplication1.Controllers
             return View(student);
         }
 
+        // GET: Delete
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
-            var student = await _studentRepo.GetByIdAsync(id.Value);
+            var student = await _studentRepo.GetWithDetailsAsync(id.Value);
             if (student == null) return NotFound();
             return View(student);
         }
 
+        // POST: Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
