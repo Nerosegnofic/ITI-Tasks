@@ -21,7 +21,12 @@
     <dd class="col-sm-9">@Html.DisplayFor(m => m.Hours)</dd>
 
     <dt class="col-sm-3">Department</dt>
-    <dd class="col-sm-9">@Model.Department.Name</dd>
+    <dd class="col-sm-9">@Model.Department?.Name</dd>
+
+    <dt class="col-sm-3">Instructors</dt>
+    <dd class="col-sm-9">
+        @(Model.Instructors != null ? string.Join(", ", Model.Instructors.Select(i => i.Name)) : "None")
+    </dd>
 </dl>
 
 <div>

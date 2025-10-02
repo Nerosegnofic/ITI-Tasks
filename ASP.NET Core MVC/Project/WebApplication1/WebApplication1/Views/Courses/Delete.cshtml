@@ -12,8 +12,17 @@
     <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Name)</dt>
     <dd class="col-sm-9">@Html.DisplayFor(m => m.Name)</dd>
 
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Degree)</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(m => m.Degree)</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.MinimumDegree)</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(m => m.MinimumDegree)</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Hours)</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(m => m.Hours)</dd>
+
     <dt class="col-sm-3">Department</dt>
-    <dd class="col-sm-9">@Model.Department.Name</dd>
+    <dd class="col-sm-9">@Model.Department?.Name</dd>
 </dl>
 
 <form asp-action="Delete">

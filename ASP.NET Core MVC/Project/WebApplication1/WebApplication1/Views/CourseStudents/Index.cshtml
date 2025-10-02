@@ -5,11 +5,22 @@
 }
 
 <h1>CourseStudents</h1>
+
 <p>
     <a asp-action="Create" class="btn btn-primary">Add New</a>
 </p>
 
-<table class="table">
+<!-- 🔍 Search Form -->
+<form asp-action="Index" method="get" class="mb-3">
+    <div class="input-group">
+        <input type="text" name="searchString" class="form-control"
+               placeholder="Search by Student or Course..."
+               value="@(ViewData["CurrentFilter"] ?? "")" />
+        <button type="submit" class="btn btn-outline-primary">Search</button>
+    </div>
+</form>
+
+<table class="table table-striped">
     <thead>
         <tr>
             <th>Course</th>
