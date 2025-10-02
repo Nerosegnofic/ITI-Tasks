@@ -1,184 +1,104 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using WebApplication1.Data;
+using System.Linq;
+using System.Threading.Tasks;
 using WebApplication1.Models;
+using WebApplication1.Repositories.Interfaces;
 
 namespace WebApplication1.Controllers
 {
     public class CourseStudentsController : Controller
     {
-        private readonly LearningCenterContext _context;
+        private readonly ICourseStudentRepository _csRepo;
+        private readonly ICourseRepository _courseRepo;
+        private readonly IStudentRepository _studentRepo;
 
-        public CourseStudentsController(LearningCenterContext context)
+        public CourseStudentsController(ICourseStudentRepository csRepo, ICourseRepository courseRepo, IStudentRepository studentRepo)
         {
-            _context = context;
+            _csRepo = csRepo;
+            _courseRepo = courseRepo;
+            _studentRepo = studentRepo;
         }
 
-        // GET: CourseStudents
         public async Task<IActionResult> Index(string searchString)
         {
-            ViewData["CurrentFilter"] = searchString;
-
-            var query = _context.CourseStudents
-                .Include(cs => cs.Course)
-                .Include(cs => cs.Student)
-                .AsQueryable();
-
-            if (!string.IsNullOrEmpty(searchString))
+            var list = (await _csRepo.GetAllAsync()).ToList();
+            if (!string.IsNullOrWhiteSpace(searchString))
             {
-                query = query.Where(cs =>
-                    cs.Course.Name.Contains(searchString) ||
-                    cs.Student.Name.Contains(searchString));
+                list = list.Where(cs => (cs.Course != null && cs.Course.Name.Contains(searchString)) ||
+                                        (cs.Student != null && cs.Student.Name.Contains(searchString))).ToList();
             }
-
-            var courseStudents = await query.ToListAsync();
-            return View(courseStudents);
+            return View(list);
         }
 
-        // GET: CourseStudents/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.CourseStudents == null)
-            {
-                return NotFound();
-            }
-
-            var courseStudent = await _context.CourseStudents
-                .Include(cs => cs.Course)
-                .Include(cs => cs.Student)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (courseStudent == null)
-            {
-                return NotFound();
-            }
-
-            return View(courseStudent);
+            if (id == null) return NotFound();
+            var cs = await _csRepo.GetByIdAsync(id.Value);
+            if (cs == null) return NotFound();
+            return View(cs);
         }
 
-        // GET: CourseStudents/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["CrsId"] = new SelectList(_context.Courses, "Id", "Name");
-            ViewData["StdId"] = new SelectList(_context.Students, "Id", "Name");
+            ViewData["CrsId"] = new SelectList(await _courseRepo.GetAllAsync(), "Id", "Name");
+            ViewData["StdId"] = new SelectList(await _studentRepo.GetAllAsync(), "Id", "Name");
             return View();
         }
 
-        // POST: CourseStudents/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Degree,CrsId,StdId")] CourseStudent courseStudent)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(courseStudent);
-                await _context.SaveChangesAsync();
+                await _csRepo.AddAsync(courseStudent);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CrsId"] = new SelectList(_context.Courses, "Id", "Name", courseStudent.CrsId);
-            ViewData["StdId"] = new SelectList(_context.Students, "Id", "Name", courseStudent.StdId);
+            ViewData["CrsId"] = new SelectList(await _courseRepo.GetAllAsync(), "Id", "Name", courseStudent.CrsId);
+            ViewData["StdId"] = new SelectList(await _studentRepo.GetAllAsync(), "Id", "Name", courseStudent.StdId);
             return View(courseStudent);
         }
 
-        // GET: CourseStudents/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.CourseStudents == null)
-            {
-                return NotFound();
-            }
-
-            var courseStudent = await _context.CourseStudents.FindAsync(id);
-            if (courseStudent == null)
-            {
-                return NotFound();
-            }
-
-            ViewData["CrsId"] = new SelectList(_context.Courses, "Id", "Name", courseStudent.CrsId);
-            ViewData["StdId"] = new SelectList(_context.Students, "Id", "Name", courseStudent.StdId);
-            return View(courseStudent);
+            if (id == null) return NotFound();
+            var cs = await _csRepo.GetByIdAsync(id.Value);
+            if (cs == null) return NotFound();
+            ViewData["CrsId"] = new SelectList(await _courseRepo.GetAllAsync(), "Id", "Name", cs.CrsId);
+            ViewData["StdId"] = new SelectList(await _studentRepo.GetAllAsync(), "Id", "Name", cs.StdId);
+            return View(cs);
         }
 
-        // POST: CourseStudents/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Degree,CrsId,StdId")] CourseStudent courseStudent)
         {
-            if (id != courseStudent.Id)
-            {
-                return NotFound();
-            }
-
+            if (id != courseStudent.Id) return NotFound();
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(courseStudent);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CourseStudentExists(courseStudent.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                await _csRepo.UpdateAsync(courseStudent);
                 return RedirectToAction(nameof(Index));
             }
-
-            ViewData["CrsId"] = new SelectList(_context.Courses, "Id", "Name", courseStudent.CrsId);
-            ViewData["StdId"] = new SelectList(_context.Students, "Id", "Name", courseStudent.StdId);
+            ViewData["CrsId"] = new SelectList(await _courseRepo.GetAllAsync(), "Id", "Name", courseStudent.CrsId);
+            ViewData["StdId"] = new SelectList(await _studentRepo.GetAllAsync(), "Id", "Name", courseStudent.StdId);
             return View(courseStudent);
         }
 
-        // GET: CourseStudents/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.CourseStudents == null)
-            {
-                return NotFound();
-            }
-
-            var courseStudent = await _context.CourseStudents
-                .Include(cs => cs.Course)
-                .Include(cs => cs.Student)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (courseStudent == null)
-            {
-                return NotFound();
-            }
-
-            return View(courseStudent);
+            if (id == null) return NotFound();
+            var cs = await _csRepo.GetByIdAsync(id.Value);
+            if (cs == null) return NotFound();
+            return View(cs);
         }
 
-        // POST: CourseStudents/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.CourseStudents == null)
-            {
-                return Problem("Entity set 'LearningCenterContext.CourseStudents' is null.");
-            }
-            var courseStudent = await _context.CourseStudents.FindAsync(id);
-            if (courseStudent != null)
-            {
-                _context.CourseStudents.Remove(courseStudent);
-            }
-
-            await _context.SaveChangesAsync();
+            await _csRepo.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool CourseStudentExists(int id)
-        {
-            return (_context.CourseStudents?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
