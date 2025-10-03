@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Learning Center</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+
     <environment include="Development">
         <link rel="stylesheet" href="~/css/site.css" />
     </environment>
 </head>
 <body>
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">LearningCenter</a>
@@ -18,30 +20,80 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" asp-controller="Departments" asp-action="Index">Departments</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Courses" asp-action="Index">Courses</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Students" asp-action="Index">Students</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Instructors" asp-action="Index">Instructors</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="CourseStudents" asp-action="Index">CourseStudents</a></li>
+                    @* Departments: Admin only *@
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Departments" asp-action="Index">Departments</a>
+                        </li>
+                    }
+
+                    @* Courses: Admin or HR *@
+                    @if (User.IsInRole("Admin") || User.IsInRole("HR"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Courses" asp-action="Index">Courses</a>
+                        </li>
+                    }
+
+                    @* Students: Admin, HR *@
+                    @if (User.IsInRole("Admin") || User.IsInRole("HR"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Students" asp-action="Index">Students</a>
+                        </li>
+                    }
+
+                    @* Instructors: Admin, HR, Instructor *@
+                    @if (User.IsInRole("Admin") || User.IsInRole("HR") || User.IsInRole("Instructor"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Instructors" asp-action="Index">Instructors</a>
+                        </li>
+                    }
+
+                    @* CourseStudents: Admin, HR *@
+                    @if (User.IsInRole("Admin") || User.IsInRole("HR"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="CourseStudents" asp-action="Index">CourseStudents</a>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>
     </nav>
 
+    <!-- Main content -->
     <div class="container mt-4">
         @RenderBody()
     </div>
 
+    <!-- Footer -->
     <footer class="bg-light text-center py-3 mt-4">
         <div class="container">
             <span class="text-muted">© @DateTime.Now.Year Learning Center — All rights reserved.</span>
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+
+    <!-- Global delete confirmation -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll("a[data-confirm]").forEach(function (link) {
+                link.addEventListener("click", function (e) {
+                    if (!confirm(link.getAttribute("data-confirm"))) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+    </script>
 
     @RenderSection("Scripts", required: false)
 </body>
