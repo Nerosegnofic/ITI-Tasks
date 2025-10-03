@@ -1,4 +1,5 @@
 ﻿@model WebApplication1.Models.Course
+
 @{
     ViewData["Title"] = "Edit Course";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -57,9 +58,6 @@
                 </select>
             </div>
 
-            <!-- Custom Validation Field (hidden) -->
-            <input type="hidden" asp-for="Validation" />
-
             <!-- Buttons -->
             <button type="submit" class="btn btn-primary">Save</button>
             <a asp-action="Index" class="btn btn-secondary ms-2">Back to List</a>
@@ -68,7 +66,5 @@
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }

@@ -37,7 +37,7 @@
             <th>Grade</th>
             <th>Image</th>
             <th>Department</th>
-            <th></th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -62,13 +62,15 @@
                     <td>@item.Department?.Name</td>
                     <td>
                         <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+
                         @if (User.IsInRole("Admin") || User.IsInRole("HR") || (User.IsInRole("Student") && item.Username == User.Identity?.Name))
                         {
-                            @: | <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                            <text> | <a asp-action="Edit" asp-route-id="@item.Id">Edit</a></text>
                         }
+
                         @if (User.IsInRole("Admin") || User.IsInRole("HR"))
                         {
-                            @: | <a asp-action="Delete" asp-route-id="@item.Id" onclick="return confirm('Are you sure you want to delete this student?');">Delete</a>
+                            <text> | <a asp-action="Delete" asp-route-id="@item.Id" onclick="return confirm('Are you sure you want to delete this student?');">Delete</a></text>
                         }
                     </td>
                 </tr>

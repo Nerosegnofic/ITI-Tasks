@@ -20,45 +20,21 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    @* Departments: Admin only *@
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Departments" asp-action="Index">Departments</a>
-                        </li>
-                    }
-
-                    @* Courses: Admin or HR *@
-                    @if (User.IsInRole("Admin") || User.IsInRole("HR"))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Courses" asp-action="Index">Courses</a>
-                        </li>
-                    }
-
-                    @* Students: Admin, HR *@
-                    @if (User.IsInRole("Admin") || User.IsInRole("HR"))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Students" asp-action="Index">Students</a>
-                        </li>
-                    }
-
-                    @* Instructors: Admin, HR, Instructor *@
-                    @if (User.IsInRole("Admin") || User.IsInRole("HR") || User.IsInRole("Instructor"))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Instructors" asp-action="Index">Instructors</a>
-                        </li>
-                    }
-
-                    @* CourseStudents: Admin, HR *@
-                    @if (User.IsInRole("Admin") || User.IsInRole("HR"))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="CourseStudents" asp-action="Index">CourseStudents</a>
-                        </li>
-                    }
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Departments" asp-action="Index">Departments</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Courses" asp-action="Index">Courses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Students" asp-action="Index">Students</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Instructors" asp-action="Index">Instructors</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="CourseStudents" asp-action="Index">CourseStudents</a>
+                    </li>
                 </ul>
             </div>
         </div>
