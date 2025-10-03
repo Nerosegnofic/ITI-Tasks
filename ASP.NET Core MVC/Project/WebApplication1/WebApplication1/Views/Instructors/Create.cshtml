@@ -36,13 +36,17 @@
 
     <div class="col-md-6">
         <label asp-for="DeptId" class="form-label"></label>
-        <select asp-for="DeptId" class="form-select" asp-items="ViewBag.DeptId"></select>
+        <select asp-for="DeptId" class="form-select" asp-items="ViewBag.DeptId">
+            <option value="">-- Select a Department --</option>
+        </select>
         <span asp-validation-for="DeptId" class="text-danger"></span>
     </div>
 
     <div class="col-md-6">
         <label asp-for="CrsId" class="form-label"></label>
-        <select asp-for="CrsId" class="form-select" asp-items="ViewBag.CrsId"></select>
+        <select asp-for="CrsId" class="form-select" asp-items="ViewBag.CrsId">
+            <option value="">-- Select a Course (optional) --</option>
+        </select>
         <span asp-validation-for="CrsId" class="text-danger"></span>
     </div>
 
@@ -53,7 +57,5 @@
 </form>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }
