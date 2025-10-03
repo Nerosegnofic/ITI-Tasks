@@ -30,23 +30,35 @@ namespace WebApplication1.Repositories.Implementations
 
         public async Task<IEnumerable<Course>> GetAllAsync()
         {
-            return await _context.Courses.Include(c => c.Department)
-                                         .Include(c => c.Instructors)
-                                         .ToListAsync();
+            return await _context.Courses
+                                 .Include(c => c.Department)
+                                 .Include(c => c.Instructors)
+                                 .ToListAsync();
+        }
+
+        // ✅ Added to support filtering with Department + Instructor
+        public async Task<IEnumerable<Course>> GetAllWithDetailsAsync()
+        {
+            return await _context.Courses
+                                 .Include(c => c.Department)
+                                 .Include(c => c.Instructors)
+                                 .ToListAsync();
         }
 
         public async Task<Course?> GetByIdAsync(int id)
         {
-            return await _context.Courses.Include(c => c.Department)
-                                         .Include(c => c.Instructors)
-                                         .FirstOrDefaultAsync(c => c.Id == id);
+            return await _context.Courses
+                                 .Include(c => c.Department)
+                                 .Include(c => c.Instructors)
+                                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task<IEnumerable<Course>> GetByDepartmentAsync(int deptId)
         {
-            return await _context.Courses.Where(c => c.DeptId == deptId)
-                                         .Include(c => c.Department)
-                                         .ToListAsync();
+            return await _context.Courses
+                                 .Where(c => c.DeptId == deptId)
+                                 .Include(c => c.Department)
+                                 .ToListAsync();
         }
 
         public async Task UpdateAsync(Course entity)

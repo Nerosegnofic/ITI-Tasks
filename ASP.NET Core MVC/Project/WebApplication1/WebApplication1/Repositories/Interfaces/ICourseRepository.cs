@@ -7,5 +7,8 @@ namespace WebApplication1.Repositories.Interfaces
     public interface ICourseRepository : IReadableRepository<Course>, IWritableRepository<Course>
     {
         Task<IEnumerable<Course>> GetByDepartmentAsync(int deptId);
+
+        // ✅ Added to support filtering with Department & Instructors
+        Task<IEnumerable<Course>> GetAllWithDetailsAsync();
     }
 }
