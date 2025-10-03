@@ -1,8 +1,32 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home - Learning Center";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center mt-5">
+    <h1 class="display-4 text-primary">Welcome to the Learning Center</h1>
+    <p class="lead">Manage courses, instructors, students, and departments all in one place.</p>
+
+    <div class="mt-4">
+        <a asp-controller="Courses" asp-action="Index" class="btn btn-outline-primary btn-lg me-2">
+            View Courses
+        </a>
+        <a asp-controller="Departments" asp-action="Index" class="btn btn-outline-success btn-lg me-2">
+            View Departments
+        </a>
+        <a asp-controller="Students" asp-action="Index" class="btn btn-outline-info btn-lg">
+            View Students
+        </a>
+    </div>
+
+    <hr class="my-5" />
+
+    <h3>Get Started</h3>
+    <p>
+        <a asp-controller="Account" asp-action="Register" class="btn btn-primary me-2">Register</a>
+        <a asp-controller="Account" asp-action="Login" class="btn btn-secondary">Login</a>
+    </p>
+
+    <p class="text-muted mt-4">
+        Your Learning Center is designed to streamline course and student management with ease.
+    </p>
 </div>
