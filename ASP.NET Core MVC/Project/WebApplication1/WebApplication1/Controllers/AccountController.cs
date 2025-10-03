@@ -32,38 +32,44 @@ namespace WebApplication1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model, string role)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return View(model);
+
+            if (string.IsNullOrEmpty(role))
             {
-                var user = new IdentityUser { UserName = model.Username, Email = model.Email };
-                var result = await _userManager.CreateAsync(user, model.Password);
+                ModelState.AddModelError("", "Role must be selected.");
+                return View(model);
+            }
 
-                if (result.Succeeded)
-                {
-                    // Ensure role exists
-                    if (!await _roleManager.RoleExistsAsync(role))
-                        await _roleManager.CreateAsync(new IdentityRole(role));
+            var user = new IdentityUser { UserName = model.Username, Email = model.Email };
+            var result = await _userManager.CreateAsync(user, model.Password);
 
-                    // Assign role
-                    await _userManager.AddToRoleAsync(user, role);
-
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
-                }
-
+            if (!result.Succeeded)
+            {
                 foreach (var error in result.Errors)
                     ModelState.AddModelError("", error.Description);
+
+                return View(model);
             }
-            return View(model);
+
+            // Ensure the role exists
+            if (!await _roleManager.RoleExistsAsync(role))
+                await _roleManager.CreateAsync(new IdentityRole(role));
+
+            // Assign role
+            await _userManager.AddToRoleAsync(user, role);
+
+            // Sign in the new user
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            return RedirectToAction("Index", "Home");
         }
 
         // GET: /Account/Login
         [AllowAnonymous]
         public IActionResult Login(string returnUrl = null)
         {
-            var model = new LoginViewModel
-            {
-                ReturnUrl = returnUrl
-            };
+            var model = new LoginViewModel { ReturnUrl = returnUrl };
             return View(model);
         }
 
@@ -73,20 +79,16 @@ namespace WebApplication1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var result = await _signInManager.PasswordSignInAsync(
-                    model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
+            if (!ModelState.IsValid)
+                return View(model);
 
-                if (result.Succeeded)
-                {
-                    return RedirectToLocal(model.ReturnUrl);
-                }
+            var result = await _signInManager.PasswordSignInAsync(
+                model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
 
-                ModelState.AddModelError("", "Invalid login attempt.");
-            }
+            if (result.Succeeded)
+                return RedirectToLocal(model.ReturnUrl);
 
-            // Preserve ReturnUrl in case of failed login
+            ModelState.AddModelError("", "Invalid login attempt.");
             return View(model);
         }
 
@@ -101,18 +103,16 @@ namespace WebApplication1.Controllers
 
         // GET: /Account/AccessDenied
         [AllowAnonymous]
-        public IActionResult AccessDenied()
-        {
-            return View();
-        }
+        public IActionResult AccessDenied() => View();
 
-        // Helpers
+        // -------------------
+        // Helper method
         private IActionResult RedirectToLocal(string returnUrl)
         {
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);
-            else
-                return RedirectToAction("Index", "Home");
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }
