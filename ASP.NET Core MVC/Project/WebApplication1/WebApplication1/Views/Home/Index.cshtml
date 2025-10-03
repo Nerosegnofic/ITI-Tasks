@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Home - Learning Center";
 }
 
@@ -20,13 +20,23 @@
 
     <hr class="my-5" />
 
-    <h3>Get Started</h3>
-    <p>
-        <a asp-controller="Account" asp-action="Register" class="btn btn-primary me-2">Register</a>
-        <a asp-controller="Account" asp-action="Login" class="btn btn-secondary">Login</a>
-    </p>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <h3>Hello, @User.Identity.Name!</h3>
+        <p class="text-muted mt-3">
+            You are logged in. Use the navigation bar to access your courses, departments, or students.
+        </p>
+    }
+    else
+    {
+        <h3>Get Started</h3>
+        <p>
+            <a asp-controller="Account" asp-action="Register" class="btn btn-primary me-2">Register</a>
+            <a asp-controller="Account" asp-action="Login" class="btn btn-secondary">Login</a>
+        </p>
 
-    <p class="text-muted mt-4">
-        Your Learning Center is designed to streamline course and student management with ease.
-    </p>
+        <p class="text-muted mt-4">
+            Your Learning Center is designed to streamline course and student management with ease.
+        </p>
+    }
 </div>
