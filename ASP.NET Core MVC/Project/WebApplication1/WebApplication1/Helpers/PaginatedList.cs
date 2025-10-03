@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace WebApplication1.Helpers
 {
@@ -22,10 +23,26 @@ namespace WebApplication1.Helpers
         public bool HasPreviousPage => PageIndex > 1;
         public bool HasNextPage => PageIndex < TotalPages;
 
+        // Generic CreateAsync that works with EF IQueryable or in-memory IQueryable
         public static async Task<PaginatedList<T>> CreateAsync(IQueryable<T> source, int pageIndex, int pageSize)
         {
-            var count = await source.CountAsync();
-            var items = await source.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
+            int count;
+            List<T> items;
+
+            // Check if the provider supports EF Core async
+            if (source.Provider is IAsyncQueryProvider)
+            {
+                // EF Core query
+                count = await source.CountAsync();
+                items = await source.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
+            }
+            else
+            {
+                // In-memory query
+                count = source.Count();
+                items = source.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
+            }
+
             return new PaginatedList<T>(items, count, pageIndex, pageSize);
         }
     }

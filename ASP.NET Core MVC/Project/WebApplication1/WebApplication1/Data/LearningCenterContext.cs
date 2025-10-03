@@ -1,11 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using WebApplication1.Models;
 
 namespace WebApplication1.Data
 {
-    public class LearningCenterContext : DbContext
+    public class LearningCenterContext : IdentityDbContext<IdentityUser>
     {
-        public LearningCenterContext(DbContextOptions<LearningCenterContext> options) : base(options) { }
+        public LearningCenterContext(DbContextOptions<LearningCenterContext> options)
+            : base(options)
+        {
+        }
 
         public DbSet<Department> Departments { get; set; }
         public DbSet<Course> Courses { get; set; }
@@ -15,6 +20,7 @@ namespace WebApplication1.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Call Identity first
             base.OnModelCreating(modelBuilder);
 
             // Department
@@ -93,7 +99,6 @@ namespace WebApplication1.Data
                       .HasForeignKey(i => i.DeptId)
                       .OnDelete(DeleteBehavior.NoAction);
 
-                // Make CrsId optional
                 entity.HasOne(i => i.Course)
                       .WithMany(c => c.Instructors)
                       .HasForeignKey(i => i.CrsId)

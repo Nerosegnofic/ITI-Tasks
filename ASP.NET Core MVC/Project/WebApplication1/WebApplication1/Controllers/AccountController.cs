@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using WebApplication1.Models;
 using WebApplication1.ViewModels;
 
 namespace WebApplication1.Controllers
@@ -61,15 +60,18 @@ namespace WebApplication1.Controllers
         [AllowAnonymous]
         public IActionResult Login(string returnUrl = null)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
+            var model = new LoginViewModel
+            {
+                ReturnUrl = returnUrl
+            };
+            return View(model);
         }
 
         // POST: /Account/Login
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -78,12 +80,13 @@ namespace WebApplication1.Controllers
 
                 if (result.Succeeded)
                 {
-                    return RedirectToLocal(returnUrl);
+                    return RedirectToLocal(model.ReturnUrl);
                 }
 
                 ModelState.AddModelError("", "Invalid login attempt.");
             }
 
+            // Preserve ReturnUrl in case of failed login
             return View(model);
         }
 
@@ -109,7 +112,7 @@ namespace WebApplication1.Controllers
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);
             else
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                return RedirectToAction("Index", "Home");
         }
     }
 }

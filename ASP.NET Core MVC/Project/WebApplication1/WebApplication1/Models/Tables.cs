@@ -34,27 +34,28 @@ namespace WebApplication1.Models
         public int MinimumDegree { get; set; }
 
         [Required]
-        [Range(1, 10)]
+        [Range(1, 10, ErrorMessage = "Hours must be between 1 and 10")]
         public int Hours { get; set; }
 
         [Required]
         public int DeptId { get; set; }
+
         public Department? Department { get; set; }
 
         public ICollection<CourseStudent>? CourseStudents { get; set; } = new List<CourseStudent>();
         public ICollection<Instructor>? Instructors { get; set; } = new List<Instructor>();
 
-        // ✅ Hidden property used to trigger custom validation
-        [CustomValidation(typeof(Course), nameof(ValidateDegree))]
-        public string? Validation { get; set; }
-
         // ✅ Custom validation method
         public static ValidationResult? ValidateDegree(Course course, ValidationContext context)
         {
+            if (course == null)
+                return new ValidationResult("Course object is null");
+
             if (course.MinimumDegree >= course.Degree)
             {
                 return new ValidationResult("Minimum degree must be less than Degree");
             }
+
             return ValidationResult.Success;
         }
     }
