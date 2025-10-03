@@ -27,21 +27,36 @@ namespace WebApplication1.Models
         [StringLength(100)]
         public required string Name { get; set; }
 
-        [Range(0, 1000)]
-        public int? Degree { get; set; }
+        [Range(50, 100, ErrorMessage = "Degree must be between 50 and 100")]
+        public int Degree { get; set; }
 
-        [Range(0, 1000)]
-        public int? MinimumDegree { get; set; }
+        [Range(20, 50, ErrorMessage = "Minimum degree must be between 20 and 50")]
+        public int MinimumDegree { get; set; }
 
+        [Required]
         [Range(1, 10)]
-        public int? Hours { get; set; }
+        public int Hours { get; set; }
 
         [Required]
         public int DeptId { get; set; }
         public Department? Department { get; set; }
 
-        public ICollection<CourseStudent>? CourseStudents { get; set; } = [];
-        public ICollection<Instructor>? Instructors { get; set; } = [];
+        public ICollection<CourseStudent>? CourseStudents { get; set; } = new List<CourseStudent>();
+        public ICollection<Instructor>? Instructors { get; set; } = new List<Instructor>();
+
+        // ✅ Hidden property used to trigger custom validation
+        [CustomValidation(typeof(Course), nameof(ValidateDegree))]
+        public string? Validation { get; set; }
+
+        // ✅ Custom validation method
+        public static ValidationResult? ValidateDegree(Course course, ValidationContext context)
+        {
+            if (course.MinimumDegree >= course.Degree)
+            {
+                return new ValidationResult("Minimum degree must be less than Degree");
+            }
+            return ValidationResult.Success;
+        }
     }
 
     public class Student
@@ -64,6 +79,8 @@ namespace WebApplication1.Models
         [Required]
         public int DeptId { get; set; }
         public Department? Department { get; set; }
+
+        public string Username { get; set; } = string.Empty;
 
         public ICollection<CourseStudent>? CourseStudents { get; set; } = [];
     }
@@ -91,6 +108,8 @@ namespace WebApplication1.Models
 
         public int? CrsId { get; set; }
         public Course? Course { get; set; }
+
+        public string Username { get; set; } = string.Empty;
     }
 
     public class CourseStudent

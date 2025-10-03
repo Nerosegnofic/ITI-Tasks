@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplication1.Data;
 
@@ -10,9 +11,11 @@ using WebApplication1.Data;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(LearningCenterContext))]
-    partial class LearningCenterContextModelSnapshot : ModelSnapshot
+    [Migration("20251003094547_AddUsernameToStudentAndInstructor")]
+    partial class AddUsernameToStudentAndInstructor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,25 +32,22 @@ namespace WebApplication1.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Degree")
+                    b.Property<int?>("Degree")
                         .HasColumnType("int");
 
                     b.Property<int>("DeptId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Hours")
+                    b.Property<int?>("Hours")
                         .HasColumnType("int");
 
-                    b.Property<int>("MinimumDegree")
+                    b.Property<int?>("MinimumDegree")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Validation")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
