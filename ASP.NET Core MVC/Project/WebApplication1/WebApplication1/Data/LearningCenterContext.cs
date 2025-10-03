@@ -93,9 +93,11 @@ namespace WebApplication1.Data
                       .HasForeignKey(i => i.DeptId)
                       .OnDelete(DeleteBehavior.NoAction);
 
+                // Make CrsId optional
                 entity.HasOne(i => i.Course)
                       .WithMany(c => c.Instructors)
                       .HasForeignKey(i => i.CrsId)
+                      .IsRequired(false)
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
