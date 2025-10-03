@@ -22,13 +22,23 @@ builder.Services.AddScoped<ICourseStudentRepository, CourseStudentRepository>();
 builder.Services.AddSession();
 
 // ----------------------
-// Add authentication
+// Add Authentication & Authorization
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Account/Login";  // Redirect here if not logged in
+        options.LoginPath = "/Account/Login";       // Redirect here if not logged in
+        options.AccessDeniedPath = "/Account/AccessDenied"; // Redirect here if not authorized
         options.ExpireTimeSpan = TimeSpan.FromHours(1);
+        options.SlidingExpiration = true;           // Extend session if active
     });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdmin", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("RequireHR", policy => policy.RequireRole("HR"));
+    options.AddPolicy("RequireInstructor", policy => policy.RequireRole("Instructor"));
+    options.AddPolicy("RequireStudent", policy => policy.RequireRole("Student"));
+});
 // ----------------------
 
 var app = builder.Build();
@@ -45,7 +55,7 @@ app.UseRouting();
 app.UseMiddleware<RequestLoggingMiddleware>();
 
 // ----------------------
-// Add authentication middleware
+// Add Authentication & Authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
 // ----------------------
