@@ -81,12 +81,11 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 // ----------------------
-// Seed roles and hardcoded admin user
+// Seed roles only
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-    await SeedRoles.InitializeAsync(roleManager, userManager);
+    await SeedRoles.InitializeAsync(roleManager);
 }
 
 // ----------------------
